@@ -5,14 +5,9 @@ import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
     Bars3Icon,
     BellIcon,
-    CalendarIcon,
-    ChartPieIcon,
     Cog6ToothIcon,
-    DocumentDuplicateIcon,
-    FolderIcon,
-    HomeIcon,
-    UsersIcon,
     XMarkIcon,
+    PencilSquareIcon
 } from "@heroicons/react/24/outline";
 import {
     ChevronDownIcon,
@@ -20,12 +15,12 @@ import {
 } from "@heroicons/react/20/solid";
 
 const navigation = [
-    { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
-    { name: "Team", href: "#", icon: UsersIcon, current: false },
-    { name: "Projects", href: "#", icon: FolderIcon, current: false },
-    { name: "Calendar", href: "#", icon: CalendarIcon, current: false },
-    { name: "Documents", href: "#", icon: DocumentDuplicateIcon, current: false },
-    { name: "Reports", href: "#", icon: ChartPieIcon, current: false },
+    { name: "Page 1", href: "#", current: true },
+    { name: "Applying GANs to Website Design", href: "#", current: false },
+    { name: "Projects", href: "#", current: false },
+    { name: "Calendar", href: "#", current: false },
+    { name: "Documents", href: "#", current: false },
+    { name: "Reports", href: "#", current: false },
 ];
 const teams = [
     { id: 1, name: "Heroicons", href: "#", initial: "H", current: false },
@@ -39,10 +34,6 @@ const userNavigation = [
 
 function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(" ");
-}
-
-function SearchBox() {
-    return (<></>)
 }
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -127,7 +118,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                                         "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
                                                                     )}
                                                                 >
-                                                                    <item.icon
+                                                                    <PencilSquareIcon
                                                                         className={classNames(
                                                                             item.current
                                                                                 ? "text-white"
@@ -214,7 +205,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                                         "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
                                                     )}
                                                 >
-                                                    <item.icon
+                                                    <PencilSquareIcon
                                                         className={classNames(
                                                             item.current
                                                                 ? "text-white"

@@ -1,9 +1,15 @@
-'use client'
+"use client";
+
+import React from "react";
+import RichTextExample from "./richtext";
 
 export default function EditorElement() {
   return (
-    <div>
-    Test
-    </div>
+    <>
+      {/*
+    <TailwindContent />
+    */}
+      <RichTextExample />
+    </>
   );
 }
