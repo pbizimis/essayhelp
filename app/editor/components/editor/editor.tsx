@@ -18,8 +18,19 @@ import {
   RightAlignIcon,
 } from "./icons";
 import TextAlign from "@tiptap/extension-text-align";
+import { useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 
 export default function TipTapEditor() {
+  const [saveStatus, setSaveStatus] = useState(true);
+
+  const debouncedUpdates = useDebouncedCallback(async (editor) => {
+    const json = editor.getJSON();
+    setSaveStatus(false);
+    console.log(json);
+    setSaveStatus(true);
+  }, 750);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -33,36 +44,10 @@ export default function TipTapEditor() {
           "prose dark:prose-invert prose-sm sm:prose-base lg:prose-lg xl:prose-2xl m-5 focus:outline-none",
       },
     },
-    content: `
-  <h2>
-    Hi there,
-  </h2>
-  <p>
-    this is a basic <em>basic</em> example of <strong>tiptap</strong>. Sure, there are all kind of basic text styles you’d probably expect from a text editor. But wait until you see the lists:
-  </p>
-  <ul>
-    <li>
-      That’s a bullet list with one …
-    </li>
-    <li>
-      … or two list items.
-    </li>
-  </ul>
-  <p>
-    Isn’t that great? And all of that is editable. But wait, there’s more. Let’s try a code block:
-  </p>
-  <pre><code class="language-css">body {
-  display: none;
-}</code></pre>
-  <p>
-    I know, I know, this is impressive. It’s only the tip of the iceberg though. Give it a try and click a little bit around. Don’t forget to check the other examples too.
-  </p>
-  <blockquote>
-    Wow, that’s amazing. Good work, boy! 👏
-    <br />
-    — Mom
-  </blockquote>
-`,
+    onUpdate: ({ editor }) => {
+      setSaveStatus(false);
+      debouncedUpdates(editor);
+    },
   });
 
   if (!editor) return <></>;
