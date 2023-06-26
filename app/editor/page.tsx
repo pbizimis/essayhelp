@@ -2,8 +2,8 @@ import TipTapEditor from "./components/editor/editor";
 
 export default function Editor() {
   return (
-    <main className="flex flex-col min-h-screen items-center justify-center p-24">
-    <TipTapEditor />
+    <main className="flex min-h-screen flex-col items-center justify-center p-24">
+      <TipTapEditor />
     </main>
   );
 }

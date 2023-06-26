@@ -9,9 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.21.3",
+    "@clerk/nextjs": "^4.21.10",
     "@headlessui/react": "^1.7.15",
     "@heroicons/react": "^2.0.18",
+    "@prisma/client": "^4.15.0",
     "@tiptap/extension-text-align": "^2.0.3",
     "@tiptap/pm": "^2.0.3",
     "@tiptap/react": "^2.0.3",
@@ -22,7 +23,7 @@
     "autoprefixer": "10.4.14",
     "eslint": "8.42.0",
     "eslint-config-next": "13.4.5",
-    "next": "13.4.5",
+    "next": "^13.4.7",
     "postcss": "8.4.24",
     "react": "18.2.0",
     "react-dom": "18.2.0",

@@ -11,15 +11,16 @@ import {
   PlusSmallIcon,
 } from "@heroicons/react/24/outline";
 import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useAuth } from "@clerk/nextjs";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
 const navigation = [
-  { name: "Page 1", href: "#", current: true },
-  { name: "Applying GANs to Website Design", href: "#", current: false },
-  { name: "Projects", href: "#", current: false },
-  { name: "Calendar", href: "#", current: false },
-  { name: "Documents", href: "#", current: false },
-  { name: "Reports", href: "#", current: false },
+  { documentName: "Page 1", documentId: "923847234987" },
+  {
+    documentName: "Applying GANs to Website Design",
+    documentId: "98234273949834",
+  },
 ];
 const teams = [
   { id: 1, name: "Heroicons", href: "#", initial: "H", current: false },
@@ -106,12 +107,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                       <ul role="list" className="flex flex-1 flex-col gap-y-7">
                         <li>
                           <ul role="list" className="-mx-2 space-y-1">
-                            {navigation.map((item) => (
-                              <li key={item.name}>
+                            {navigation.map((document) => (
+                              <li key={document.documentId}>
                                 <a
-                                  href={item.href}
+                                  href={""}
                                   className={classNames(
-                                    item.current
+                                    false
                                       ? "bg-indigo-700 text-white"
                                       : "text-indigo-200 hover:bg-indigo-700 hover:text-white",
                                     "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
@@ -119,14 +120,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                                 >
                                   <PencilSquareIcon
                                     className={classNames(
-                                      item.current
+                                      false
                                         ? "text-white"
                                         : "text-indigo-200 group-hover:text-white",
                                       "h-6 w-6 shrink-0"
                                     )}
                                     aria-hidden="true"
                                   />
-                                  {item.name}
+                                  {document.documentName}
                                 </a>
                               </li>
                             ))}
@@ -278,7 +279,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 }
 
 function Sidebar() {
-  const [documents, setDocuments] = useState(navigation);
+  const pathname = usePathname();
+  const newDoc = pathname === "/editor/neues-dokument";
+
+  let documents = navigation;
+
+  if (newDoc)
+    documents = [
+      { documentName: "neues Dokument", documentId: "neues-dokument" },
+      ...documents,
+    ];
+
   return (
     <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
       {/* Sidebar component, swap this element with another sidebar if you like */}
@@ -295,8 +306,8 @@ function Sidebar() {
             <li>
               <ul role="list" className="-mx-2 space-y-1">
                 <li key="neues Dokument" className="mb-4">
-                  <button
-                    onClick={() => {}}
+                  <Link
+                    href={"/editor/neues-dokument"}
                     className={classNames(
                       "w-full border border-indigo-400 text-indigo-200 hover:bg-indigo-700 hover:text-white",
                       "group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
@@ -310,13 +321,13 @@ function Sidebar() {
                       aria-hidden="true"
                     />
                     neues Dokument
-                  </button>
+                  </Link>
                 </li>
-                {documents.map((item) => (
+                {documents.map((document) => (
                   <InputTest
-                    key={item.name}
-                    title={item.name}
-                    current={item.current}
+                    key={document.documentId}
+                    name={document.documentName}
+                    id={document.documentId}
                   />
                 ))}
               </ul>
@@ -365,16 +376,38 @@ function Sidebar() {
   );
 }
 
-function InputTest({ title, current }: { title: string; current: boolean }) {
-  const [text, setText] = useState(title);
-  const [newText, setNewText] = useState(title);
+function InputTest({ name, id }: { name: string; id: string }) {
+  const [text, setText] = useState(name);
+  const [newText, setNewText] = useState(name);
   const [editMode, setEditMode] = useState(false);
+  const pathname = usePathname();
+  const current = pathname === `/editor/${id}`;
+  const router = useRouter();
+  const { getToken } = useAuth();
 
-  function handleBlur(saveText: boolean) {
+  async function changeDocumentName(documentName: string) {
+    try {
+      const response = await fetch("http://localhost:3000/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${await getToken()}`,
+        },
+        body: JSON.stringify({ documentName: documentName, documentId: id }),
+      });
+
+      const result = await response.json();
+      console.log("Success:", result);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  }
+
+  async function handleBlur(saveText: boolean) {
     setEditMode(false);
     if (saveText) {
       setText(newText);
-      console.log("Update database with", newText);
+      await changeDocumentName(newText);
     }
   }
 
@@ -388,7 +421,7 @@ function InputTest({ title, current }: { title: string; current: boolean }) {
           onClick={(e) => {
             if (e.detail === 1) {
               timer = setTimeout(() => {
-                console.log("Doc");
+                router.push(`/editor/${id}`);
               }, 200);
             }
           }}

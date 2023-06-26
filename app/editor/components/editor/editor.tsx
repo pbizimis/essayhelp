@@ -20,14 +20,33 @@ import {
 import TextAlign from "@tiptap/extension-text-align";
 import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import { useAuth } from "@clerk/nextjs";
 
-export default function TipTapEditor() {
+export default function TipTapEditor({ documentId }: { documentId: string }) {
   const [saveStatus, setSaveStatus] = useState(true);
+
+  const { getToken } = useAuth();
 
   const debouncedUpdates = useDebouncedCallback(async (editor) => {
     const json = editor.getJSON();
     setSaveStatus(false);
-    console.log(json);
+
+    try {
+      const response = await fetch("http://localhost:3000/api", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${await getToken()}`,
+        },
+        body: json,
+      });
+
+      const result = await response.json();
+      console.log("Success:", result);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+
     setSaveStatus(true);
   }, 750);
 
@@ -54,6 +73,13 @@ export default function TipTapEditor() {
 
   return (
     <>
+      <div
+        className={
+          saveStatus
+            ? "bg-sky-200"
+            : "bg-red-200" + " fixed bottom-0 right-0 h-12 w-12"
+        }
+      ></div>
       <Toolbar>
         <ToolbarButton
           active={editor.isActive("bold")}
