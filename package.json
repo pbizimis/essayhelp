@@ -7,10 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "vercel-build": "prisma generate && prisma migrate deploy && next build"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@clerk/nextjs": "^4.21.10",
+    "@clerk/nextjs": "^4.21.12",
     "@headlessui/react": "^1.7.15",
     "@heroicons/react": "^2.0.18",
     "@prisma/client": "^4.15.0",
