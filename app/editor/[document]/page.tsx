@@ -3,11 +3,11 @@ import TipTapEditor from "../components/editor/editor";
 export default function DocumentView({
   params,
 }: {
-  params: { documentId: string };
+  params: { document: string };
 }) {
     return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <TipTapEditor documentId={params.documentId} />
+      <TipTapEditor document={params.document} />
     </main>
     );
 }

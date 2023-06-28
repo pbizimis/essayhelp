@@ -36,7 +36,21 @@ function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+interface DocumentTitle {
+  title: string;
+  id: string;
+}
+
+export default function Layout({
+  allDocumentTitles,
+  currentDocumentId,
+  children,
+}: {
+  allDocumentTitles: DocumentTitle[];
+  currentDocumentId: string;
+  children: React.ReactNode;
+}) {
+  console.log("CURR", currentDocumentId);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -180,7 +194,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </Transition.Root>
 
         {/* Static sidebar for desktop */}
-        <Sidebar />
+        <Sidebar
+          allDocumentTitles={allDocumentTitles}
+          currentDocumentId={currentDocumentId}
+        />
 
         <div className="lg:pl-72">
           <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
@@ -278,16 +295,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Sidebar() {
+function Sidebar({
+  allDocumentTitles,
+  currentDocumentId,
+}: {
+  allDocumentTitles: DocumentTitle[];
+  currentDocumentId: string;
+}) {
   const pathname = usePathname();
   const newDoc = pathname === "/editor/neues-dokument";
 
-  let documents = navigation;
-
   if (newDoc)
-    documents = [
-      { documentName: "neues Dokument", documentId: "neues-dokument" },
-      ...documents,
+    allDocumentTitles = [
+      { title: "neues Dokument", id: "neues-dokument" },
+      ...allDocumentTitles,
     ];
 
   return (
@@ -323,11 +344,11 @@ function Sidebar() {
                     neues Dokument
                   </Link>
                 </li>
-                {documents.map((document) => (
+                {allDocumentTitles.map((document) => (
                   <InputTest
-                    key={document.documentId}
-                    name={document.documentName}
-                    id={document.documentId}
+                    key={document.id}
+                    name={document.title}
+                    id={document.id}
                   />
                 ))}
               </ul>
@@ -397,7 +418,7 @@ function InputTest({ name, id }: { name: string; id: string }) {
       });
 
       const result = await response.json();
-      console.log("Success:", result);
+      return result;
     } catch (error) {
       console.error("Error:", error);
     }
@@ -407,7 +428,9 @@ function InputTest({ name, id }: { name: string; id: string }) {
     setEditMode(false);
     if (saveText) {
       setText(newText);
-      await changeDocumentName(newText);
+      changeDocumentName(newText).then((docInfo) =>
+        router.push(`/editor/${docInfo.id}`)
+      );
     }
   }
 

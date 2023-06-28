@@ -12,19 +12,31 @@ export default async function EditorLayout({
   const { userId } = auth();
   const documentId = params.document;
 
-  const documentJson = await db.document.findUnique({
+  if (!userId) return console.log("USER NOT LOGGED IN"); // add loading
+
+  const allDocuments = await db.document.findMany({
     where: {
-      id: documentId,
+      authorId: userId,
+    },
+    select: {
+      id: true,
+      title: true,
     },
   });
 
-  console.log(documentJson);
+  const selectedDocument = await db.document.findUnique({
+    where: {
+      id: documentId,
+      authorId: userId,
+    },
+  });
 
-  // load all document titles
-  // laod the json of the selected one
+  console.log("all docs", allDocuments);
+  console.log("sel doc", selectedDocument);
+
   return (
     <>
-      <Layout>
+      <Layout allDocumentTitles={allDocuments} currentDocumentId={documentId}>
         <div>{children}</div>
       </Layout>
     </>

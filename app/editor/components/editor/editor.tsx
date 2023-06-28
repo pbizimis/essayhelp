@@ -1,6 +1,6 @@
 "use client";
 
-import { useEditor, EditorContent } from "@tiptap/react";
+import { useEditor, EditorContent, Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Toolbar, { ToolbarButton } from "./toolbar";
 import {
@@ -22,30 +22,32 @@ import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { useAuth } from "@clerk/nextjs";
 
-export default function TipTapEditor({ documentId }: { documentId: string }) {
+export default function TipTapEditor({ document }: { document: string }) {
   const [saveStatus, setSaveStatus] = useState(true);
 
   const { getToken } = useAuth();
 
-  const debouncedUpdates = useDebouncedCallback(async (editor) => {
-    const json = editor.getJSON();
+  const debouncedUpdates = useDebouncedCallback(async (editor: Editor) => {
     setSaveStatus(false);
 
-    try {
-      const response = await fetch("http://localhost:3000/api", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${await getToken()}`,
-        },
-        body: json,
-      });
+    const docInfo = {
+      id: document,
+      content: editor.getJSON(),
+    };
 
-      const result = await response.json();
-      console.log("Success:", result);
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    console.log(docInfo);
+
+    const response = await fetch("http://localhost:3000/api/test", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${await getToken()}`,
+      },
+      body: JSON.stringify(docInfo),
+    });
+
+    const result = await response.json();
+    console.log("Success:", result);
 
     setSaveStatus(true);
   }, 750);
